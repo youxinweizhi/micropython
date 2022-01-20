@@ -34,3 +34,16 @@ jobs:
         name: MYESP32_C3 firmware
         path: ports/esp32/build-MYESP32_C3/firmware.bin
         
+    #发送邮件    
+    - name: 'Send mail'
+      uses: dawidd6/action-send-mail@master
+      with:
+        serveraddress: smtp.163.com
+        serverport: 465
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.MAILPWD }}
+        subject: esp32ce_firmware
+        body: ports/esp32/build-MYESP32_C3/firmware.bin
+        to: ${{ secrets.RECEIVER }}
+        from: GitHub Actions
+        content_type: text/html        
