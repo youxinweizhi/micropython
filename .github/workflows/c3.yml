@@ -15,6 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    -name: display env
+     run:python3 tools/getenv.py
+     
     #安装idf4.3.1的环境
     - name: Install packages
       run: source tools/ci.sh && ci_esp32_setup_helper v4.3.1
@@ -34,16 +37,4 @@ jobs:
         name: MYESP32_C3 firmware
         path: ports/esp32/build-MYESP32_C3/firmware.bin
         
-    #发送邮件    
-    - name: 'Send mail'
-      uses: dawidd6/action-send-mail@master
-      with:
-        serveraddress: smtp.163.com
-        serverport: 465
-        username: ${{ secrets.USER }}
-        password: ${{ secrets.MAILPWD }}
-        subject: esp32ce_firmware
-        body: ports/esp32/build-MYESP32_C3/firmware.bin
-        to: ${{ secrets.RECEIVER }}
-        from: GitHub Actions
-        content_type: text/html        
+       
