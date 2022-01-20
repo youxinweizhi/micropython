@@ -14,7 +14,7 @@ jobs:
     - uses: actions/checkout@v2
     
     - name: display env
-      run:python3 tools/getenv.py
+      run: python3 tools/getenv.py
      
     #安装idf4.3.1的环境
     - name: Install packages
