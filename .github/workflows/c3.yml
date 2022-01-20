@@ -1,5 +1,3 @@
-
-#工作流Workflow 的名称，Github 在存储库的 Action 页面上显示 Workflow 的名称。
 name: myEspC3
 
 #触发条件：创建新的tag时
