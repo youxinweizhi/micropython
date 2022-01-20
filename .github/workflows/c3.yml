@@ -1,27 +1,36 @@
+#上传tag标记是触发自动编辑固件
+#工作流名称
 name: myEspC3
 
+#触发条件：创建新的tag时
 on:
   push:
+    branches: [ esp32c3 ]
     tags:
       - v*
 
+#任务
 jobs:
   build_idf431:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
-
+    
+    #安装idf4.3.1的环境
     - name: Install packages
       run: source tools/ci.sh && ci_esp32_setup_helper v4.3.1
+    
+    #编译固件
     - name: Build
       run: |
         source esp-idf/export.sh
         make -C mpy-cross
         make -C ports/esp32 submodules
         make -C ports/esp32 BOARD=MYESP32_C3
-
-    - name: Upload artifact
+    
+    #固件的路径
+    - name: Upload firmware
       uses: actions/upload-artifact@master
       with:
-        name: ${{ env.BOARD }} firmware
+        name: MYESP32_C3 firmware
         path: ports/esp32/build-MYESP32_C3/firmware.bin
