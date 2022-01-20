@@ -5,7 +5,6 @@ name: myEspC3
 #触发条件：创建新的tag时
 on:
   push:
-    branches: [ esp32c3 ]
     tags:
       - v*
 
