@@ -24,4 +24,4 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: ${{ env.BOARD }} firmware
-        path: ports/esp32/build-${{ env.BOARD }}/firmware.bin
+        path: ports/esp32/build-MYESP32_C3/firmware.bin
