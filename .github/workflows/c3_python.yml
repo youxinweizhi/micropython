@@ -22,16 +22,13 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.7
-        
-    #环境变量
-    - name: set env
+                
+    #执行py脚本        
+    - name: Update paper list
       env:
         MAILUSER: ${{ secrets.MAILUSER}}
         MAILPWD: ${{ secrets.MAILPWD}}
         RECEIVER: ${{ secrets.RECEIVER}}
-        
-    #执行py脚本        
-    - name: Update paper list
       run: |
         python tools/getenv.py
      
