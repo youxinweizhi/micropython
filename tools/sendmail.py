@@ -1,7 +1,7 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import os
+import os,sys
 
 def SendMail(user,password,receive,filepath):
     # 发送邮箱服务器
@@ -47,6 +47,9 @@ password = os.environ.get('MAILPWD')
 # 发送和接收邮箱
 sender = user
 receive = user
-filepath=r"ports/esp32/build-MYESP32_C3/firmware.bin"
-
-SendMail(user,password,receive,filepath)
+#filepath=r"ports/esp32/build-MYESP32_C3/firmware.bin"
+filepath=sys.argv[1]
+if filepath:
+    SendMail(user,password,receive,filepath)
+else:
+    print(获取文件路径失败)

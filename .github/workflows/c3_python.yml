@@ -9,7 +9,7 @@ on:
 #任务
 jobs:
   build_idf431:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-20.04 
     steps:
     #下载项目
     - uses: actions/checkout@v2
@@ -49,4 +49,4 @@ jobs:
         MAILUSER: ${{ secrets.MAILUSER}}
         MAILPWD: ${{ secrets.MAILPWD}}
       run: |
-        python tools/sendmail.py       
+        python tools/sendmail.py  "ports/esp32/build-MYESP32_C3/firmware.bin"      
