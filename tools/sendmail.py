@@ -47,6 +47,6 @@ password = os.environ.get('MAILPWD')
 # 发送和接收邮箱
 sender = user
 receive = user
-filepath=r"ports/esp32/build-GENERIC_C3/firmware.bin"
+filepath=r"ports/esp32/build-MYESP32_C3/firmware.bin"
 
 SendMail(user,password,receive,filepath)
