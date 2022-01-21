@@ -11,10 +11,29 @@ jobs:
   build_idf431:
     runs-on: ubuntu-20.04
     steps:
+    #下载项目
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - run: git checkout esp32c3    
     
-    - name: display env
-      run: python3 tools/getenv.py
+    #安装python环境
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+        
+    #环境变量
+    - name: set env
+      env:
+        MAILUSER: ${{ secrets.MAILUSER}}
+        MAILPWD: ${{ secrets.MAILPWD}}
+        RECEIVER: ${{ secrets.RECEIVER}}
+        
+    #执行py脚本        
+    - name: Update paper list
+      run: |
+        python tools/getenv.py
      
     #安装idf4.3.1的环境
     - name: Install packages
