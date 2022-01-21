@@ -1,0 +1,48 @@
+name: Build My Firmware
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      board:
+        description: 'Input board name'
+        required: true
+        default: 'WALKLINEHARDWARE'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build_idf431"
+
+  build_idf431:
+    env:
+      BOARD: ${{ github.event.inputs.board }}
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-20.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - run: git checkout esp32c3
+
+    # Runs a single command using the runners shell
+    - name: Install packages
+      run: source tools/ci.sh && ci_esp32_setup_helper v4.3.1
+
+    - name: Build
+      run: |
+        source esp-idf/export.sh
+        make -C mpy-cross
+        make -C ports/esp32 submodules
+        make -C ports/esp32 BOARD=$BOARD
+        echo build firmware for $BOARD complete
+    - name: Upload artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: ${{ env.BOARD }} firmware
+        path: ports/esp32/build-${{ env.BOARD }}/firmware.bin
