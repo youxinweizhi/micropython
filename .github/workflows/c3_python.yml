@@ -23,14 +23,6 @@ jobs:
       with:
         python-version: 3.7
                 
-    #执行py脚本        
-    - name: Update paper list
-      env:
-        MAILUSER: ${{ secrets.MAILUSER}}
-        MAILPWD: ${{ secrets.MAILPWD}}
-        RECEIVER: ${{ secrets.RECEIVER}}
-      run: |
-        python tools/getenv.py
      
     #安装idf4.3.1的环境
     - name: Install packages
@@ -51,4 +43,10 @@ jobs:
         name: MYESP32_C3 firmware
         path: ports/esp32/build-MYESP32_C3/firmware.bin
         
-       
+    #执行py脚本        
+    - name: exec python
+      env:
+        MAILUSER: ${{ secrets.MAILUSER}}
+        MAILPWD: ${{ secrets.MAILPWD}}
+      run: |
+        python tools/sendmail.py       
