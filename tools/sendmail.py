@@ -41,8 +41,8 @@ def SendMail(user,password,receive,filepath):
 
 
 # 发送邮箱用户名密码
-#user = os.environ.get('MAILUSER')
-#password = os.environ.get('MAILPWD')
+user = os.environ.get('MAILUSER')
+password = os.environ.get('MAILPWD')
 
 # 发送和接收邮箱
 sender = user
