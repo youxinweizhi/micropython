@@ -26,7 +26,7 @@ jobs:
      
     #安装idf4.3.1的环境
     - name: Install packages
-      run: source tools/ci.sh && ci_esp32_setup_helper v4.3.1
+      run: source tools/ci.sh && ci_esp32_setup_helper v4.4.1
     
     #编译固件
     - name: Build
