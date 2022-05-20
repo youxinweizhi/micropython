@@ -35,7 +35,7 @@ sys.path.append(os.path.dirname(__file__) + "/../py")
 import makeqstrdata as qstrutil
 
 # MicroPython constants
-MPY_VERSION = 5
+MPY_VERSION = 6
 MP_NATIVE_ARCH_X86 = 1
 MP_NATIVE_ARCH_X64 = 2
 MP_NATIVE_ARCH_ARMV7M = 5
@@ -48,9 +48,7 @@ MP_CODE_NATIVE_VIPER = 4
 MP_SCOPE_FLAG_VIPERRELOC = 0x10
 MP_SCOPE_FLAG_VIPERRODATA = 0x20
 MP_SCOPE_FLAG_VIPERBSS = 0x40
-MICROPY_PY_BUILTINS_STR_UNICODE = 2
 MP_SMALL_INT_BITS = 31
-QSTR_WINDOW_SIZE = 32
 
 # ELF constants
 R_386_32 = 1
@@ -117,7 +115,7 @@ class ArchData:
 ARCH_DATA = {
     "x86": ArchData(
         "EM_386",
-        MP_NATIVE_ARCH_X86 << 2 | MICROPY_PY_BUILTINS_STR_UNICODE,
+        MP_NATIVE_ARCH_X86 << 2,
         2,
         4,
         (R_386_PC32, R_386_GOT32, R_386_GOT32X),
@@ -125,7 +123,7 @@ ARCH_DATA = {
     ),
     "x64": ArchData(
         "EM_X86_64",
-        MP_NATIVE_ARCH_X64 << 2 | MICROPY_PY_BUILTINS_STR_UNICODE,
+        MP_NATIVE_ARCH_X64 << 2,
         2,
         8,
         (R_X86_64_GOTPCREL, R_X86_64_REX_GOTPCRELX),
@@ -133,7 +131,7 @@ ARCH_DATA = {
     ),
     "armv7m": ArchData(
         "EM_ARM",
-        MP_NATIVE_ARCH_ARMV7M << 2 | MICROPY_PY_BUILTINS_STR_UNICODE,
+        MP_NATIVE_ARCH_ARMV7M << 2,
         2,
         4,
         (R_ARM_GOT_BREL,),
@@ -141,7 +139,7 @@ ARCH_DATA = {
     ),
     "armv7emsp": ArchData(
         "EM_ARM",
-        MP_NATIVE_ARCH_ARMV7EMSP << 2 | MICROPY_PY_BUILTINS_STR_UNICODE,
+        MP_NATIVE_ARCH_ARMV7EMSP << 2,
         2,
         4,
         (R_ARM_GOT_BREL,),
@@ -149,7 +147,7 @@ ARCH_DATA = {
     ),
     "armv7emdp": ArchData(
         "EM_ARM",
-        MP_NATIVE_ARCH_ARMV7EMDP << 2 | MICROPY_PY_BUILTINS_STR_UNICODE,
+        MP_NATIVE_ARCH_ARMV7EMDP << 2,
         2,
         4,
         (R_ARM_GOT_BREL,),
@@ -157,7 +155,7 @@ ARCH_DATA = {
     ),
     "xtensa": ArchData(
         "EM_XTENSA",
-        MP_NATIVE_ARCH_XTENSA << 2 | MICROPY_PY_BUILTINS_STR_UNICODE,
+        MP_NATIVE_ARCH_XTENSA << 2,
         2,
         4,
         (R_XTENSA_32, R_XTENSA_PLT),
@@ -165,7 +163,7 @@ ARCH_DATA = {
     ),
     "xtensawin": ArchData(
         "EM_XTENSA",
-        MP_NATIVE_ARCH_XTENSAWIN << 2 | MICROPY_PY_BUILTINS_STR_UNICODE,
+        MP_NATIVE_ARCH_XTENSAWIN << 2,
         4,
         4,
         (R_XTENSA_32, R_XTENSA_PLT),
@@ -860,11 +858,12 @@ class MPYOutput:
 
     def write_qstr(self, s):
         if s in qstrutil.static_qstr_list:
-            self.write_bytes(bytes([0, qstrutil.static_qstr_list.index(s) + 1]))
+            self.write_uint((qstrutil.static_qstr_list.index(s) + 1) << 1 | 1)
         else:
             s = bytes(s, "ascii")
             self.write_uint(len(s) << 1)
             self.write_bytes(s)
+            self.write_bytes(b"\x00")
 
     def write_reloc(self, base, offset, dest, n):
         need_offset = not (base == self.prev_base and offset == self.prev_offset + 1)
@@ -905,14 +904,19 @@ def build_mpy(env, entry_offset, fmpy, native_qstr_vals, native_qstr_objs):
     out.open(fmpy)
 
     # MPY: header
-    out.write_bytes(
-        bytearray(
-            [ord("M"), MPY_VERSION, env.arch.mpy_feature, MP_SMALL_INT_BITS, QSTR_WINDOW_SIZE]
-        )
-    )
+    out.write_bytes(bytearray([ord("M"), MPY_VERSION, env.arch.mpy_feature, MP_SMALL_INT_BITS]))
+
+    # MPY: n_qstr
+    out.write_uint(1)
+
+    # MPY: n_obj
+    out.write_uint(0)
+
+    # MPY: qstr table
+    out.write_qstr(fmpy)  # filename
 
     # MPY: kind/len
-    out.write_uint(len(env.full_text) << 2 | (MP_CODE_NATIVE_VIPER - MP_CODE_BYTECODE))
+    out.write_uint(len(env.full_text) << 3 | (MP_CODE_NATIVE_VIPER - MP_CODE_BYTECODE))
 
     # MPY: machine code
     out.write_bytes(env.full_text)
@@ -936,20 +940,15 @@ def build_mpy(env, entry_offset, fmpy, native_qstr_vals, native_qstr_objs):
         scope_flags |= MP_SCOPE_FLAG_VIPERBSS
     out.write_uint(scope_flags)
 
-    # MPY: n_obj
-    out.write_uint(0)
-
-    # MPY: n_raw_code
-    out.write_uint(0)
-
-    # MPY: rodata and/or bss
+    # MPY: bss and/or rodata
     if len(env.full_rodata):
         rodata_const_table_idx = 1
         out.write_uint(len(env.full_rodata))
-        out.write_bytes(env.full_rodata)
     if len(env.full_bss):
-        bss_const_table_idx = bool(env.full_rodata) + 1
+        bss_const_table_idx = 2
         out.write_uint(len(env.full_bss))
+    if len(env.full_rodata):
+        out.write_bytes(env.full_rodata)
 
     # MPY: relocation information
     prev_kind = None

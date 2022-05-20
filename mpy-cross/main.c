@@ -72,7 +72,8 @@ STATIC int compile_and_save(const char *file, const char *output_file, const cha
         #endif
 
         mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
-        mp_raw_code_t *rc = mp_compile_to_raw_code(&parse_tree, source_name, false);
+        mp_module_context_t *ctx = m_new_obj(mp_module_context_t);
+        mp_compiled_module_t cm = mp_compile_to_raw_code(&parse_tree, source_name, false, ctx);
 
         vstr_t vstr;
         vstr_init(&vstr, 16);
@@ -83,7 +84,7 @@ STATIC int compile_and_save(const char *file, const char *output_file, const cha
         } else {
             vstr_add_str(&vstr, output_file);
         }
-        mp_raw_code_save_file(rc, vstr_null_terminated_str(&vstr));
+        mp_raw_code_save_file(&cm, vstr_null_terminated_str(&vstr));
         vstr_clear(&vstr);
 
         nlr_pop();
@@ -107,7 +108,6 @@ STATIC int usage(char **argv) {
         "\n"
         "Target specific options:\n"
         "-msmall-int-bits=number : set the maximum bits used to encode a small-int\n"
-        "-mno-unicode : don't support unicode in compiled strings\n"
         "-march=<arch> : set architecture for native emitter; x86, x64, armv6, armv7m, armv7em, armv7emsp, armv7emdp, xtensa, xtensawin\n"
         "\n"
         "Implementation specific options:\n", argv[0]
@@ -202,7 +202,6 @@ MP_NOINLINE int main_(int argc, char **argv) {
 
     // set default compiler configuration
     mp_dynamic_compiler.small_int_bits = 31;
-    mp_dynamic_compiler.py_builtins_str_unicode = 1;
     #if defined(__i386__)
     mp_dynamic_compiler.native_arch = MP_NATIVE_ARCH_X86;
     mp_dynamic_compiler.nlr_buf_num_regs = MICROPY_NLR_NUM_REGS_X86;
@@ -260,10 +259,6 @@ MP_NOINLINE int main_(int argc, char **argv) {
                     return usage(argv);
                 }
                 // TODO check that small_int_bits is within range of host's capabilities
-            } else if (strcmp(argv[a], "-mno-unicode") == 0) {
-                mp_dynamic_compiler.py_builtins_str_unicode = 0;
-            } else if (strcmp(argv[a], "-municode") == 0) {
-                mp_dynamic_compiler.py_builtins_str_unicode = 1;
             } else if (strncmp(argv[a], "-march=", sizeof("-march=") - 1) == 0) {
                 const char *arch = argv[a] + sizeof("-march=") - 1;
                 if (strcmp(arch, "x86") == 0) {

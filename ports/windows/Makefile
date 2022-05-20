@@ -49,14 +49,12 @@ SRC_C = \
 	shared/runtime/gchelper_generic.c \
 	ports/unix/main.c \
 	ports/unix/input.c \
-	ports/unix/modos.c \
 	ports/unix/modmachine.c \
 	ports/unix/modtime.c \
 	ports/unix/gccollect.c \
 	windows_mphal.c \
 	realpath.c \
 	init.c \
-	sleep.c \
 	fmode.c \
 	$(SRC_MOD) \
 	$(wildcard $(VARIANT_DIR)/*.c)
