@@ -24,9 +24,9 @@ jobs:
         python-version: 3.7
                 
      
-    #安装idf4.3.1的环境
+    #安装idf4.4.1的环境
     - name: Install packages
-      run: source tools/ci.sh && ci_esp32_setup_helper v4.4.1
+      run: source tools/ci.sh && ci_esp32_idf44_setup
     
     #编译固件
     - name: Build
