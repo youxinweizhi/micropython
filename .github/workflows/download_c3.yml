@@ -1,4 +1,4 @@
-name: download
+name: download c3
 
 on: workflow_dispatch
 jobs:
