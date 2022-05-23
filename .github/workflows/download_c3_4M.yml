@@ -20,7 +20,7 @@ jobs:
         source esp-idf/export.sh
         make  -C mpy-cross
         make  -C ports/esp32 submodules
-        make  -C ports/esp32 BOARD=MYESP32_C3
+        make  -C ports/esp32 BOARD=MYESP32_C3_4M
 
     - name: Upload firmware
       uses: actions/upload-artifact@main
