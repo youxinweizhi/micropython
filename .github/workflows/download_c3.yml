@@ -1,6 +1,8 @@
 name: download c3
 
-on: workflow_dispatch
+on: 
+  push:
+  workflow_dispatch:
 
 jobs:
   build_idf44:
