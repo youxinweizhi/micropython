@@ -1,0 +1,29 @@
+name: build esp32c3_4M
+
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  build_idf44:
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - uses: actions/checkout@v2
+    - run: git checkout esp32c3
+    
+    - name: Install packages
+      run: source tools/ci.sh && ci_esp32_idf44_setup
+        
+    - name: Build
+      run: |
+        source esp-idf/export.sh
+        make  -C mpy-cross
+        make  -C ports/esp32 submodules
+        make  -C ports/esp32 BOARD=MYESP32_C3_2M
+
+    - name: Upload firmware
+      uses: actions/upload-artifact@main
+      with:
+        name: c3-release
+        path: ports/esp32/build*/firmware.bin
