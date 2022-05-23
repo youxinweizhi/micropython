@@ -1,4 +1,4 @@
-name: build esp32c3_4M
+name: build esp32c3_2M
 
 on: 
   push:
