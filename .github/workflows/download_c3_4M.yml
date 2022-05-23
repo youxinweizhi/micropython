@@ -25,5 +25,5 @@ jobs:
     - name: Upload firmware
       uses: actions/upload-artifact@main
       with:
-        name: c3-release
+        name: esp32c3_4M_firmware
         path: ports/esp32/build*/firmware.bin
