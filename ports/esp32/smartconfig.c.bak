@@ -107,7 +107,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(smartconfig_info_obj, smartconfig_info);
 
 
 STATIC const mp_rom_map_elem_t smartconfig_module_globals_table[] = {
-    {MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_wificonfig)},
+    {MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_smartconfig)},
     {MP_ROM_QSTR(MP_QSTR_start), MP_ROM_PTR(&smartconfig_start_obj)},
     {MP_ROM_QSTR(MP_QSTR_success), MP_ROM_PTR(&smartconfig_success_obj)},
     {MP_ROM_QSTR(MP_QSTR_info), MP_ROM_PTR(&smartconfig_info_obj)},
@@ -123,4 +123,4 @@ const mp_obj_module_t smartconfig_user_cmodule = {
     .globals = (mp_obj_dict_t *)&smartconfig_module_globals,
 };
 
-MP_REGISTER_MODULE(MP_QSTR_wificonfig, smartconfig_user_cmodule, 1);
+MP_REGISTER_MODULE(MP_QSTR_smartconfig, smartconfig_user_cmodule, 1);
